@@ -84,4 +84,68 @@ public static class CXExtension
         PoolManager.Instance.PushObject(obj);
     }
     #endregion
+
+    #region Mono
+
+    /// <summary>
+    /// 添加Update监听
+    /// </summary>
+    public static void OnUpdate(this object obj, Action action)
+    {
+        MonoManager.Instance.AddUpdateListener(action);
+    }
+    /// <summary>
+    /// 移除Update监听
+    /// </summary>
+    public static void RemoveUpdate(this object obj, Action action)
+    {
+        MonoManager.Instance.RemoveUpdateListener(action);
+    }
+
+    /// <summary>
+    /// 添加LateUpdate监听
+    /// </summary>
+    public static void OnLateUpdate(this object obj, Action action)
+    {
+        MonoManager.Instance.AddLateUpdateListener(action);
+    }
+    /// <summary>
+    /// 移除LateUpdate监听
+    /// </summary>
+    public static void RemoveLateUpdate(this object obj, Action action)
+    {
+        MonoManager.Instance.RemoveLateUpdateListener(action);
+    }
+
+    /// <summary>
+    /// 添加FixedUpdate监听
+    /// </summary>
+    public static void OnFixedUpdate(this object obj, Action action)
+    {
+        MonoManager.Instance.AddFixedUpdateListener(action);
+    }
+    /// <summary>
+    /// 移除Update监听
+    /// </summary>
+    public static void RemoveFixedUpdate(this object obj, Action action)
+    {
+        MonoManager.Instance.RemoveFixedUpdateListener(action);
+    }
+
+    public static Coroutine StartCoroutine(this object obj, IEnumerator routine)
+    {
+        return MonoManager.Instance.StartCoroutine(routine);
+    }
+
+    public static void StopCoroutine(this object obj, Coroutine routine)
+    {
+        MonoManager.Instance.StopCoroutine(routine);
+    }
+    public static void StopAllCoroutines(this object obj)
+    {
+        MonoManager.Instance.StopAllCoroutines();
+    }
+
+    #endregion
+
 }

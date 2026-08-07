@@ -203,7 +203,7 @@ public class AudioManager : ManagerBase<AudioManager>
     }
     public void PlayBGAudio(string clipPath, bool loop = true, float volume = -1)
     {
-        AudioClip clip = ResManager.Instance.LoadAsset<AudioClip>(clipPath);
+        AudioClip clip = ResManager.LoadAsset<AudioClip>(clipPath);
         PlayBGAudio(clip, loop, volume);
     }
     #endregion
@@ -305,7 +305,7 @@ public class AudioManager : ManagerBase<AudioManager>
     /// <param name="callBacKTime">回调函数在音乐播放完成后执行的延迟时间</param>
     public void PlayOnShot(string clipPath, Component component, float volumeScale = 1, bool is3d = true, UnityAction callBack = null, float callBacKTime = 0)
     {
-        AudioClip audioClip = ResManager.Instance.LoadAsset<AudioClip>(clipPath);
+        AudioClip audioClip = ResManager.LoadAsset<AudioClip>(clipPath);
         if (audioClip != null) PlayOnShot(audioClip, component, volumeScale, is3d, callBack, callBacKTime);
     }
 
@@ -320,7 +320,7 @@ public class AudioManager : ManagerBase<AudioManager>
     /// <param name="callBacKTime">回调函数在音乐播放完成后执行的延迟时间</param>
     public void PlayOnShot(string clipPath, Vector3 position, float volumeScale = 1, bool is3d = true, UnityAction callBack = null, float callBacKTime = 0)
     {
-        AudioClip audioClip = ResManager.Instance.LoadAsset<AudioClip>(clipPath);
+        AudioClip audioClip = ResManager.LoadAsset<AudioClip>(clipPath);
         if (audioClip != null) PlayOnShot(audioClip, position, volumeScale, is3d, callBack, callBacKTime);
     }
     #endregion
