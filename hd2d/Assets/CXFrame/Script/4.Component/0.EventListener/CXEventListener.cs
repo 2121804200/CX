@@ -30,33 +30,28 @@ public enum CXEventType
     OnTriggerExit2D,
 }
 
-
 public interface IMouseEvent : IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
-{
-
-}
+{ }
 
 /// <summary>
 /// 事件工具
-/// 可以添加鼠标，碰撞，触发事件
+/// 可以添加 鼠标、碰撞、触发等事件
 /// </summary>
 public class CXEventListener : MonoBehaviour, IMouseEvent
 {
 
-    #region 内部类，接口等
+    #region 内部类、接口等
     /// <summary>
-    /// 某个事件中一个事件的数据包装类
+    /// 某个事件中一个时间的数据包装类
     /// </summary>
     /// <typeparam name="T"></typeparam>
-
     private class CXEventListenerEventInfo<T>
     {
-        //一个事件可以进行多个委托
-        //T:内部事件本身的参数（PointerEventData，Collision）
-        //abject[]:事件的参数
+        // T：事件本身的参数（PointerEventData、Collision）
+        // object[]:事件的参数
         public Action<T, object[]> action;
         public object[] args;
-        public void Init(Action<T, object[]> action, object[] args)
+        public void Init(Action<T,object[]> action,object[] args)
         {
             this.action = action;
             this.args = args;
@@ -73,51 +68,49 @@ public class CXEventListener : MonoBehaviour, IMouseEvent
         }
     }
 
-    interface ICXEventListenerEventInfos
+    interface ICXEventListenerEventInfos 
     {
         void RemoveAll();
+
     }
 
     /// <summary>
-    /// 一类事件的数据包装类型，包含多个CXEventListenerEventInfo<T>
+    /// 一类事件的数据包装类型：包含多个CXEventListenerEventInfo
     /// </summary>
     /// <typeparam name="T"></typeparam>
-
-    private class CXEventListenerEventInfos<T>:ICXEventListenerEventInfos
+    private class CXEventListenerEventInfos<T>: ICXEventListenerEventInfos
     {
-        //所有事件
+
+        // 所有的事件
         private List<CXEventListenerEventInfo<T>> eventList = new List<CXEventListenerEventInfo<T>>();
+
         /// <summary>
         /// 添加事件
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="args"></param>
         public void AddListener(Action<T, object[]> action, params object[] args)
         {
             CXEventListenerEventInfo<T> info = PoolManager.Instance.GetObject<CXEventListenerEventInfo<T>>();
-            info.Init(action, args);
+            info.Init(action,args);
             eventList.Add(info);
         }
+
         /// <summary>
         /// 移除事件
         /// </summary>
-        /// <param name="action"></param>
-        /// <param name="checkArgs"></param>
-        /// <param name="args"></param>
         public void RemoveListener(Action<T, object[]> action, bool checkArgs = false, params object[] args)
         {
             for (int i = 0; i < eventList.Count; i++)
             {
-                //找到这个事件
+                // 找到这个事件
                 if (eventList[i].action.Equals(action))
                 {
-                    //是否需要检查参数
-                    if (checkArgs && args.Length > 0)
+                    // 是否需要检查参数
+                    if (checkArgs&&args.Length>0)
                     {
-                        //参数如果相等
+                        // 参数如果相等
                         if (args.ArraryEquals(eventList[i].args))
                         {
-                            //移除
+                            // 移除
                             eventList[i].Destory();
                             eventList.RemoveAt(i);
                             return;
@@ -125,7 +118,7 @@ public class CXEventListener : MonoBehaviour, IMouseEvent
                     }
                     else
                     {
-                        //移除
+                        // 移除
                         eventList[i].Destory();
                         eventList.RemoveAt(i);
                         return;
@@ -139,7 +132,7 @@ public class CXEventListener : MonoBehaviour, IMouseEvent
         /// </summary>
         public void RemoveAll()
         {
-            for(int i = 0; i < eventList.Count; i++)
+            for (int i = 0; i < eventList.Count; i++)
             {
                 eventList[i].Destory();
             }
@@ -147,48 +140,66 @@ public class CXEventListener : MonoBehaviour, IMouseEvent
             this.CXObjectPushPool();
         }
 
-        public void TriggerEvent(T eventData)
+        public void TriggerEvent(T evetData)
         {
-            for(int i = 0; i < eventList.Count; i++)
+            for (int i = 0; i < eventList.Count; i++)
             {
-                eventList[i].TriggerEvent(eventData);
+                eventList[i].TriggerEvent(evetData);
             }
         }
+
     }
 
+    /// <summary>
+    /// 枚举比较器
+    /// </summary>
+    private class CXEventTypeEnumComparer : Singleton<CXEventTypeEnumComparer>,IEqualityComparer<CXEventType>
+    {
+        public bool Equals(CXEventType x, CXEventType y)
+        {
+            return x == y;
+        }
+
+        public int GetHashCode(CXEventType obj)
+        {
+            return (int)obj;
+        }
+    }
     #endregion
 
-    #region 外部访问接口
+    private Dictionary<CXEventType, ICXEventListenerEventInfos> eventInfoDic = new Dictionary<CXEventType, CXEventListener.ICXEventListenerEventInfos>(CXEventTypeEnumComparer.Instance);
 
-    private Dictionary<CXEventType,ICXEventListenerEventInfos>eventInfoDic=new Dictionary<CXEventType, ICXEventListenerEventInfos>();
+    #region 外部的访问
     /// <summary>
     /// 添加事件
     /// </summary>
-    public void AddListener<T>(CXEventType eventType,Action<T, object[]> action, params object[] args)
+    public void AddListener<T>(CXEventType eventType, Action<T, object[]> action, params object[] args)
     {
         if (eventInfoDic.ContainsKey(eventType))
         {
-            (eventInfoDic[eventType] as CXEventListenerEventInfos<T>).AddListener(action,args);
+            (eventInfoDic[eventType] as CXEventListenerEventInfos<T>).AddListener(action, args);
         }
         else
         {
-            CXEventListenerEventInfos<T> infos=PoolManager.Instance.GetObject<CXEventListenerEventInfos<T>>();
-            infos.AddListener(action,args);
-            eventInfoDic.Add(eventType,infos);
+            CXEventListenerEventInfos<T> infos = PoolManager.Instance.GetObject<CXEventListenerEventInfos<T>>();
+            infos.AddListener(action, args);
+            eventInfoDic.Add(eventType, infos);
         }
     }
+
     /// <summary>
     /// 移除事件
     /// </summary>
-    public void RemoveListener<T>(CXEventType eventType,Action<T,object[]> action,bool checkArgs=false,params object[] args)
+    public void RemoveListener<T>(CXEventType eventType, Action<T, object[]> action, bool checkArgs = false, params object[] args)
     {
         if (eventInfoDic.ContainsKey(eventType))
         {
-            (eventInfoDic[eventType] as CXEventListenerEventInfos<T>).RemoveListener(action,checkArgs,args);
+            (eventInfoDic[eventType] as CXEventListenerEventInfos<T>).RemoveListener(action, checkArgs, args);
         }
     }
+
     /// <summary>
-    /// 移除某一事件类型下的全部事件
+    /// 移除某一个事件类型下的全部事件
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="eventType"></param>
@@ -209,12 +220,15 @@ public class CXEventListener : MonoBehaviour, IMouseEvent
         {
             infos.RemoveAll();
         }
+
         eventInfoDic.Clear();
     }
-
     #endregion
 
-    private void TriggerAction<T>(CXEventType eventType,T eventData)
+    /// <summary>
+    /// 触发事件
+    /// </summary>
+    private void TriggerAction<T>(CXEventType eventType, T eventData)
     {
         if (eventInfoDic.ContainsKey(eventType))
         {

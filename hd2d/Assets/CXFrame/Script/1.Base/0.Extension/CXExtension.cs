@@ -1,19 +1,22 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Reflection;
+using System.Xml.Linq;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Video;
 
+/// <summary>
+/// CXFrame 框架主要的拓展方法
+/// </summary>
 public static class CXExtension
 {
-
     #region 通用
-    ///<summary>
-    ///获取特性
-    ///</summary>
+    /// <summary>
+    /// 获取特性
+    /// </summary>
     public static T GetAttribute<T>(this object obj) where T : Attribute
     {
-
         return obj.GetType().GetCustomAttribute<T>();
     }
     /// <summary>
@@ -23,19 +26,15 @@ public static class CXExtension
     /// <returns></returns>
     public static T GetAttribute<T>(this object obj, Type type) where T : Attribute
     {
-
         return type.GetCustomAttribute<T>();
     }
 
     /// <summary>
     /// 数组相等对比
     /// </summary>
-    /// <param name="objs"></param>
-    /// <param name="other"></param>
-    /// <returns></returns>
     public static bool ArraryEquals(this object[] objs, object[] other)
     {
-        if (other == null || objs.GetType() != other.GetType())
+        if (other==null||objs.GetType()!=other.GetType())
         {
             return false;
         }
@@ -57,7 +56,6 @@ public static class CXExtension
     }
 
     #endregion
-
     #region 资源管理
     /// <summary>
     /// GameObject放入对象池
@@ -147,5 +145,4 @@ public static class CXExtension
     }
 
     #endregion
-
 }
